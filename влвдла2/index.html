@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Важный вопрос ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(45deg, #ffafcc, #ffc8dd, #cdb4db);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #ff4d6d;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            line-height: 1.4;
+        }
+        
+        .image-container {
+            margin: 25px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+        
+        #valentine-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        #valentine-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 200px;
+        }
+        
+        #yes-btn {
+            background: linear-gradient(45deg, #ff4d6d, #ff8fa3);
+            color: white;
+        }
+        
+        #no-btn {
+            background: linear-gradient(45deg, #6d6875, #b5838d);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .heart {
+            color: #ff4d6d;
+            font-size: 1.5em;
+            margin: 0 5px;
+        }
+        
+        .counter {
+            margin-top: 15px;
+            color: #6d6875;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                min-height: 70px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                max-width: 100%;
+            }
+            
+            .image-container {
+                height: 250px;
+            }
+        }
+        
+        /* Анимация пульса */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        /* Анимация для кнопки ДА при увеличении */
+        @keyframes grow {
+            0% { transform: scale(1); }
+            100% { transform: var(--target-scale); }
+        }
+        
+        /* Стиль для белого поля (запасной вариант) */
+        .fallback-text {
+            color: #666;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="question-text">Согласен провести всю жизнь рядом со мной? <span class="heart">❤️</span></h1>
+        
+        <div class="image-container">
+            <!-- Изменили src на photo1.jpg -->
+            <img id="valentine-image" src="photo1.jpg" alt="Наше фото" 
+                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';">
+        </div>
+        
+        <div class="buttons">
+            <button id="yes-btn">ДА ❤️</button>
+            <button id="no-btn">НЕТ 💔</button>
+        </div>
+        
+        <div class="counter" id="counter">
+            Ответов "НЕТ": 0
+        </div>
+    </div>
+
+    <script>
+        // ИСПРАВЛЕНО: Локальные фото из той же папки
+        const firstImage = 'photo1.jpg';
+        const secondImage = 'photo2.jpg';
+        
+        // Фразы для кнопки НЕТ (всего 4 фразы)
+        const noPhrases = [
+            "Ты уверен?",
+            "Ну позязя",
+            "Киса, не ахуевай", 
+            "Ну я же тебя люблю"
+        ];
+        
+        // Получаем элементы
+        const imageElement = document.getElementById('valentine-image');
+        const questionElement = document.getElementById('question-text');
+        const yesButton = document.getElementById('yes-btn');
+        const noButton = document.getElementById('no-btn');
+        const counterElement = document.getElementById('counter');
+        
+        // Переменные состояния
+        let noCount = 0;
+        let isYesClicked = false;
+        
+        // Обработчик для кнопки ДА
+        yesButton.addEventListener('click', function() {
+            if (!isYesClicked) {
+                // Пытаемся загрузить вторую картинку
+                const testImg = new Image();
+                testImg.src = secondImage;
+                
+                testImg.onload = function() {
+                    // Если фото загрузилось
+                    imageElement.src = secondImage;
+                };
+                
+                testImg.onerror = function() {
+                    // Если фото не загрузилось - ставим запасную
+                    imageElement.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+                };
+                
+                questionElement.innerHTML = 'Хехехехе я не сомневалась. Я тебя тоже очень люблю <span class="heart">❤️</span>';
+                isYesClicked = true;
+                
+                // Меняем кнопки
+                yesButton.textContent = 'НАВСЕГДА! 💖';
+                yesButton.classList.add('pulse');
+                noButton.style.display = 'none';
+                
+                setTimeout(() => {
+                    yesButton.classList.remove('pulse');
+                }, 500);
+                
+                // Добавляем конфетти
+                createConfetti();
+            }
+        });
+        
+        // Обработчик для кнопки НЕТ
+        noButton.addEventListener('click', function() {
+            noCount++;
+            counterElement.textContent = `Ответов "НЕТ": ${noCount}`;
+            
+            // Выбираем фразу - просто по кругу из 4 фраз
+            const phraseIndex = (noCount - 1) % noPhrases.length;
+            const currentPhrase = noPhrases[phraseIndex];
+            
+            // Обновляем текст вопроса
+            questionElement.innerHTML = `${currentPhrase} <span class="heart">❤️</span>`;
+            
+            // Эффект пульсации для кнопки НЕТ
+            noButton.classList.add('pulse');
+            setTimeout(() => {
+                noButton.classList.remove('pulse');
+            }, 300);
+            
+            // Увеличиваем кнопку ДА после каждого НЕТ
+            if (noCount > 0) {
+                const scale = 1 + (noCount * 0.05);
+                const targetScale = Math.min(scale, 1.4);
+                yesButton.style.setProperty('--target-scale', `scale(${targetScale})`);
+                yesButton.style.animation = 'grow 0.3s ease-out forwards';
+                
+                setTimeout(() => {
+                    yesButton.style.animation = '';
+                }, 300);
+            }
+        });
+        
+        // Функция создания конфетти
+        function createConfetti() {
+            const colors = ['#ff4d6d', '#ff8fa3', '#ffafcc', '#ffc8dd', '#cdb4db'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-20px';
+                confetti.style.opacity = '0.8';
+                confetti.style.zIndex = '9999';
+                
+                document.body.appendChild(confetti);
+                
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 20}px) rotate(${360 + Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: 2000 + Math.random() * 2000,
+                    easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        // Проверка загрузки первой картинки
+        window.addEventListener('load', function() {
+            // Проверяем, загрузилась ли первая картинка
+            const img = new Image();
+            img.src = firstImage;
+            
+            img.onerror = function() {
+                // Если фото не загрузилось, показываем сообщение
+                document.querySelector('.image-container').innerHTML = 
+                    '<div class="fallback-text">' +
+                    '<p>Фото не загрузилось. Проверьте:</p>' +
+                    '<p>1. Файл называется photo1.jpg</p>' +
+                    '<p>2. Он лежит в той же папке</p>' +
+                    '</div>';
+            };
+            
+            // Анимация появления
+            document.querySelector('.container').style.opacity = '0';
+            document.querySelector('.container').style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                document.querySelector('.container').style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                document.querySelector('.container').style.opacity = '1';
+                document.querySelector('.container').style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
